@@ -3,16 +3,20 @@
 package require about_form
 package require config
 package require config_form
+package require mplayer
 package require ref
 package require ui
 
+            #puts "[join $fields |] • $pos/$total secs"
 oo::singleton create App {
+    variable Player
 }
 
 oo::define App constructor {} {
     ui::wishinit
     tk appname PlayTrack
     Config new ;# we need tk scaling done early
+    set Player ""
     my make_ui
 }
 
@@ -26,6 +30,7 @@ oo::define App method show {} {
 }
 
 oo::define App method on_startup {} {
+    set Player [Mplayer new]
 }
 
 oo::define App method make_ui {} {
@@ -54,8 +59,8 @@ oo::define App method make_layout {} {
 }
 
 oo::define App method make_bindings {} {
-    bind . <Alt-a> [callback on_about]
-    bind . <Alt-c> [callback on_config]
+    #bind . <Alt-a> [callback on_about]
+    #bind . <Alt-c> [callback on_config]
     bind . <Escape> [callback on_quit]
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
@@ -73,6 +78,7 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
+    $Player close 
     [Config new] save
     exit
 }
