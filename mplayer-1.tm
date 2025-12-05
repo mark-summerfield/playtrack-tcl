@@ -46,7 +46,7 @@ oo::define Mplayer method ReadPipe {} {
             set total [lindex $fields 6]
             event generate . <<MplayerPos>> -data {$pos $total}
         } else {
-            #puts -nonewline $line
+            event generate . <<MplayerDebug>> -data [string trim $line]
         }
     }
     if {[eof $Stream]} {

@@ -30,11 +30,11 @@ oo::define App method show {} {
 }
 
 oo::define App method on_startup {} {
-    set Player [Mplayer new]
 }
 
 oo::define App method make_ui {} {
     my prepare_ui
+    set Player [Mplayer new]
     my make_widgets
     my make_layout
     my make_bindings
@@ -59,10 +59,20 @@ oo::define App method make_layout {} {
 }
 
 oo::define App method make_bindings {} {
+    bind . <<MplayerPos>> [callback on_pos %d]
+    bind . <<MplayerDebug>> [callback on_debug %d]
     #bind . <Alt-a> [callback on_about]
     #bind . <Alt-c> [callback on_config]
     bind . <Escape> [callback on_quit]
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
+}
+
+oo::define App method on_pos data {
+    puts "on_pos: '$data'"
+}
+
+oo::define App method on_debug data {
+    puts "on_debug: '$data'"
 }
 
 oo::define App method on_config {} {
