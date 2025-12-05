@@ -1,8 +1,9 @@
+# NOTE volume now works
 playtrack.tk
 app-1.tm
 misc-1.tm
 mplayer-1.tm
-config-1.tm
+config-1.tm # TODO add [ ] Debug (default 0)
 config_form-1.tm
 
 ref-1.tm

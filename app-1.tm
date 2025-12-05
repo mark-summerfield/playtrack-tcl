@@ -33,7 +33,6 @@ oo::define App method show {} {
 oo::define App method on_startup {} {
     set config [Config new]
     if {[set filename [$config last_track]] ne ""} {
-        my on_volume 50
         my prepare_file_open $filename
     }
 }
@@ -91,6 +90,7 @@ oo::define App method make_widgets {} {
     my make_playbar
 }
 
+# TODO shortcuts F7 etc. (as per Go PlayTrack)
 oo::define App method make_playbar {} {
     set tip tooltip::tooltip
     ttk::frame .mf.play
@@ -108,11 +108,12 @@ oo::define App method make_playbar {} {
         -image [ui::icon media-skip-forward.svg $::MENU_ICON_SIZE]
     $tip .mf.play.nextButton "Play next"
     ttk::progressbar .mf.play.progress -anchor center
-    ttk::frame .mf.play.vf
-    ttk::label .mf.play.vf.volumeLabel -text 0% -compound left \
-        -anchor center -image [ui::icon volume.svg $::MENU_ICON_SIZE]
-    ttk::scale .mf.play.vf.volumeScale -orient horizontal -from 0 -to 100 \
-        -command [callback on_volume] -value 50
+    ttk::button .mf.play.quietButton -command [callback on_quiet] \
+        -image [ui::icon audio-volume-low.svg $::MENU_ICON_SIZE]
+    $tip .mf.play.quietButton "Reduce volume"
+    ttk::button .mf.play.loudButton -command [callback on_loud] \
+        -image [ui::icon audio-volume-high.svg $::MENU_ICON_SIZE]
+    $tip .mf.play.loudButton "Increase volume"
 }
 
 oo::define App method make_layout {} {
@@ -124,9 +125,8 @@ oo::define App method make_layout {} {
     pack .mf.play.playOrPauseButton -side left {*}$opts
     pack .mf.play.nextButton -side left {*}$opts
     pack .mf.play.progress -fill both -expand 1 -side left {*}$opts
-    pack .mf.play.vf -fill x -side right {*}$opts
-    pack .mf.play.vf.volumeScale -fill x -expand 1 -side bottom
-    pack .mf.play.vf.volumeLabel -fill x -expand 1 -side top
+    pack .mf.play.quietButton -side left {*}$opts
+    pack .mf.play.loudButton -side left {*}$opts
     pack .mf.tv -fill both -expand true
     pack .mf -fill both -expand true
 }
@@ -231,14 +231,13 @@ oo::define App method on_bookmarks_edit {} {
     puts on_bookmarks_edit
 }
 
-oo::define App method on_volume percent {
-    if {$Player ne ""} {
-        set volume [expr {int(round([.mf.play.vf.volumeScale get]))}]
-        .mf.play.vf.volumeLabel configure -text $volume%
-        $Player volume $volume
-    }
+oo::define App method on_quiet {} {
+    if {$Player ne ""} { $Player volume_down }
 }
 
+oo::define App method on_loud {} {
+    if {$Player ne ""} { $Player volume_up }
+}
 oo::define App method on_config {} {
     set config [Config new]
     set ok [Ref new false]

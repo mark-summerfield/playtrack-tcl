@@ -47,7 +47,9 @@ oo::define Mplayer method pause {} { my Do pause }
 
 oo::define Mplayer method stop {} { my Do stop }
 
-oo::define Mplayer method volume percent { my Do "volume $percent" }
+oo::define Mplayer method volume_down {} { my Do "volume -5" }
+
+oo::define Mplayer method volume_up {} { my Do "volume +5" }
 
 oo::define Mplayer method Do action { puts $Stream $action ; flush $Stream }
 
@@ -58,7 +60,7 @@ oo::define Mplayer method ReadPipe {} {
                     total]} {
                 event generate . <<MplayerPos>> -data "$pos $total"
             } elseif $Debug {
-                event generate . <<MplayerDebug>> -data $line
+                event generate . <<MplayerDebug>> -data "$line"
             }
         }
     }
