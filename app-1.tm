@@ -107,7 +107,7 @@ oo::define App method make_playbar {} {
     ttk::button .mf.play.nextButton -command [callback on_play_next] \
         -image [ui::icon media-skip-forward.svg $::MENU_ICON_SIZE]
     $tip .mf.play.nextButton "Play next"
-    ttk::progressbar .mf.play.progress
+    ttk::progressbar .mf.play.progress -anchor center
     ttk::frame .mf.play.vf
     ttk::label .mf.play.vf.volumeLabel -text 0% -compound left \
         -anchor center -image [ui::icon volume.svg $::MENU_ICON_SIZE]
@@ -156,7 +156,7 @@ oo::define App method populate_history_menu {} {
     set i [scan A %c]
     set config [Config new]
     foreach filename [$config history] {
-        set label [format "%c. %s" $i [humanize $filename]]
+        set label [format "%c. %s" $i [humanize_filename $filename]]
         .menu.history add command -label $label -underline 0 \
             -command [callback file_open $filename]
         incr i
@@ -190,11 +190,12 @@ oo::define App method populate_bookmarks_menu {} {
 
 oo::define App method on_pos data {
     lassign $data pos total
-    puts "on_pos: pos=$pos total=$total"
+    .mf.play.progress configure -value $pos -maximum $total \
+        -text "[humanize_secs $pos]/[humanize_secs $total]"
 }
 
 oo::define App method on_debug data {
-    puts "on_debug: '$data'"
+    puts "on_debug '$data'"
 }
 
 oo::define App method on_file_open {} {
@@ -203,7 +204,8 @@ oo::define App method on_file_open {} {
     set dir [file home]/Music
     set dir [expr {[file exists $dir] ? $dir : "[file home]/music]"}]
     set dir [expr {$filename eq "" ? $dir : [file dirname $filename]}]
-    set filename [tk_getOpenFile -filetypes $filetypes -initialdir $dir]
+    set filename [tk_getOpenFile -parent . -filetypes $filetypes \
+                  -initialdir $dir]
     if {$filename ne ""} {
         my file_open $filename
     }
@@ -265,6 +267,7 @@ oo::define App method file_open filename {
 oo::define App method prepare_file_open filename {
     puts "prepare_file_open $filename"
     .mf.label configure -text [file dirname $filename]
+    wm title . "[humanize_filename $filename] — [tk appname]"
     # TODO
     # - clear treeview
     # - load treeview with music files for this file's folder
