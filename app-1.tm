@@ -136,6 +136,7 @@ oo::define App method make_bindings {} {
     bind . <<MplayerDebug>> [callback on_debug %d]
     bind . <F3> [callback on_bookmarks_add]
     bind . <Control-b> [callback on_bookmarks_edit]
+    bind . <Control-o> [callback on_file_open]
     bind . <Control-h> [callback on_history_edit]
     bind . <Control-q> [callback on_quit]
     bind . <Escape> [callback on_quit]
@@ -197,7 +198,7 @@ oo::define App method on_debug data {
 }
 
 oo::define App method on_file_open {} {
-    filename [[Config new] last_track]
+    set filename [[Config new] last_track]
     const filetypes {{{Audio Files} {.mp3 .ogg}}}
     set dir [file home]/Music
     set dir [expr {[file exists $dir] ? $dir : "[file home]/music]"}]
