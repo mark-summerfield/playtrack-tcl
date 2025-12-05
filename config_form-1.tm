@@ -9,12 +9,14 @@ oo::class create ConfigForm {
 
     variable Ok
     variable Blinking
+    variable AutoPlayNext
 }
 
 oo::define ConfigForm constructor ok {
     set Ok $ok
     set config [Config new]
     set Blinking [$config blinking]
+    set AutoPlayNext [$config auto_play_next]
     my make_widgets 
     my make_layout
     my make_bindings
@@ -43,6 +45,13 @@ oo::define ConfigForm method make_widgets {} {
     if {$Blinking} { .configForm.mf.blinkCheckbutton state selected }
     $tip .configForm.mf.blinkCheckbutton \
         "Whether the text cursor should blink."
+    ttk::checkbutton .configForm.mf.autoPlayCheckbutton \
+        -text "Auto Play Next" -underline 0 \
+        -variable [my varname AutoPlayNext]
+    if {$AutoPlayNext} { .configForm.mf.autoPlayCheckbutton state selected }
+    $tip .configForm.mf.autoPlayCheckbutton \
+        "Whether to automatically play the next track after the current\
+        one finishes."
     set opts "-compound left -width 15"
     ttk::label .configForm.mf.configFileLabel -foreground gray25 \
         -text "Config file"
@@ -63,6 +72,7 @@ oo::define ConfigForm method make_layout {} {
     grid .configForm.mf.scaleSpinbox -row 0 -column 1 -columnspan 2 \
         -sticky we {*}$opts
     grid .configForm.mf.blinkCheckbutton -row 2 -column 1 -sticky we
+    grid .configForm.mf.autoPlayCheckbutton -row 3 -column 1 -sticky we
     grid .configForm.mf.configFileLabel -row 8 -column 0 -sticky we \
         {*}$opts
     grid .configForm.mf.configFilenameLabel -row 8 -column 1 \
@@ -81,6 +91,7 @@ oo::define ConfigForm method make_layout {} {
 oo::define ConfigForm method make_bindings {} {
     bind .configForm <Escape> [callback on_cancel]
     bind .configForm <Return> [callback on_ok]
+    bind .configForm <Alt-a> {.configForm.mf.autoPlayCheckbutton invoke}
     bind .configForm <Alt-b> {.configForm.mf.blinkCheckbutton invoke}
     bind .configForm <Alt-o> [callback on_ok]
     bind .configForm <Alt-s> {focus .configForm.mf.scaleSpinbox}
@@ -90,7 +101,8 @@ oo::define ConfigForm method on_ok {} {
     set config [Config new]
     tk scaling [.configForm.mf.scaleSpinbox get]
     $config set_blinking $Blinking
-    $Ok set true
+    $config set_auto_play_next $AutoPlayNext
+    $Ok set 1
     my delete
 }
 

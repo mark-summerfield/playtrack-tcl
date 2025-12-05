@@ -2,29 +2,45 @@
 
 oo::singleton create Mplayer {
     variable Stream
-    variable Filename
+    variable Debug
+    variable Exe
 }
 
-oo::define Mplayer constructor {} { my open }
+oo::define Mplayer constructor {} {
+    set Stream ""
+    set Debug 0
+    if {[set Exe [auto_execok mplayer]] ne ""} { my open }
+}
 
 oo::define Mplayer method open {} {
-    set Stream [open "|mplayer -zoom -slave -idle -wid [winfo id .] \
-                -input nodefault-bindings -noconfig all" r+]
-    fconfigure $Stream -blocking 0 -buffering line
-    fileevent $Stream readable [callback ReadPipe]
+    if {$Stream eq ""} {
+        set Stream [open "|$Exe -slave -idle -input nodefault-bindings \
+                    -noconfig all" r+]
+        fconfigure $Stream -blocking 0 -buffering line
+        fileevent $Stream readable [callback ReadPipe]
+    }
 }
 
 oo::define Mplayer method close {} {
-    if {$Stream ne ""} { my stop ; flush $Stream ; set Stream "" }
+    if {$Stream ne ""} {
+        my stop
+        flush $Stream
+        fileevent $Stream readable {}
+        close $Stream
+        set Stream ""
+    }
 }
+
+oo::define Mplayer method has_mplayer {} { expr {$Exe ne ""} }
+
+oo::define Mplayer method closed {} { expr {$Stream eq ""} }
 
 oo::define Mplayer method replay {} { my Do "set_property time_pos 0" }
 
 oo::define Mplayer method play filename {
-    set Filename $filename
-    my Do stop
+    my stop
     after 200        
-    my Do "loadfile \"$Filename\""
+    my Do "loadfile \"$filename\""
 }
 
 oo::define Mplayer method pause {} { my Do pause }
@@ -36,17 +52,14 @@ oo::define Mplayer method volume percent { my Do "volume $percent" }
 oo::define Mplayer method Do action { puts $Stream $action ; flush $Stream }
 
 oo::define Mplayer method ReadPipe {} {
-    set data [read $Stream]
-    foreach line [split $data \n] {
-        set line [string trim $line]
-        if {[string match A:* $line]} {
-            # TODO use regexp not split
-            set fields [split $line]
-            set pos [lindex $fields 3]
-            set total [lindex $fields 6]
-            event generate . <<MplayerPos>> -data {$pos $total}
-        } else {
-            event generate . <<MplayerDebug>> -data [string trim $line]
+    foreach line [split [read $Stream] \n] {
+        if {[set line [string trim $line]] ne ""} {
+            if {[regexp {^A:\s*(\d+.\d+).*?of\s*(\d+.\d+)} $line _ pos \
+                    total]} {
+                event generate . <<MplayerPos>> -data {$pos $total}
+            } elseif $Debug {
+                event generate . <<MplayerDebug>> -data $line
+            }
         }
     }
     if {[eof $Stream]} {
@@ -55,3 +68,6 @@ oo::define Mplayer method ReadPipe {} {
         set Stream ""
     }
 }
+
+oo::define Mplayer method debug {} { return $Debug }
+oo::define Mplayer method set_debug debug { set Debug $debug }
