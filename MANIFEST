@@ -1,6 +1,11 @@
+# TODO have mplayer generate <<MplayerDone>> when a track is complete &
+# use this to implement auto play next
+
 playtrack.tk
-app-1.tm # TODO ...
-misc-1.tm # TODO implement humanize* procs
+app-1.tm
+app_ui-1.tm
+app_actions-1.tm # TODO ...
+misc-1.tm
 mplayer-1.tm
 config-1.tm
 config_form-1.tm
