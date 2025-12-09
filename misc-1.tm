@@ -20,8 +20,31 @@ proc divmod {n div} {
 }
 
 proc humanize_filename filename {
-    string trim [string trimleft [regsub -all {[-_.]} \
-        [file tail [file rootname $filename]] " "] "0123456789"]
+    set home [file home]
+    if {[string match $home/* $filename]} {
+        set filename [string range $filename [string length $home/] end]
+    }
+    if {[string match {[Mm]usic*} $filename]} {
+        set filename [string range $filename 6 end]
+    }
+    set parts [file split $filename]
+    for {set i 1} {$i + 1 < [llength $parts]} {incr i} {
+        if {[string match {*[0-9]} [set part [lindex $parts $i]]]} {
+            ledit parts $i $i @
+        }
+    }
+    ledit parts end end [string trimleft \
+        [file rootname [lindex $parts end]] "0123456789"]
+    set name [regsub {@+} [join $parts " / "] …]
+    set name [regsub {\s+/\s+…\s+/\s+} $name " … "]
+    set name [string trim [regsub -all {[-_.]} $name " "]]
+    regsub -all {\s\s+} $name " "
+}
+
+proc humanize_trackname filename {
+    set name [file tail [file rootname $filename]]
+    set name [string trim [string trimleft $name "0123456789"]]
+    string trim [regsub -all {[-_.]} $name " "]
 }
 
 proc get_music_dir filename {

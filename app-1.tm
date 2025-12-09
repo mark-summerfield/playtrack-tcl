@@ -44,10 +44,11 @@ oo::define App method maybe_new_dir filename {
             [.mf.dirLabel cget -text]} {
         .mf.dirLabel configure -text $dir_label
         $TrackView delete [$TrackView children {}]
-        foreach name [lsort -dictionary \
-                      [glob -directory $dir *.{mp3,ogg}]] {
+        set filenames [glob -directory $dir *.{mp3,ogg}]
+        set n 0
+        foreach name [lsort -dictionary $filenames] {
             $TrackView insert {} end -id [to_id $name] \
-                -text [humanize_filename $name]
+                -text "[format %2d [incr n]].  [humanize_trackname $name]"
         }
     }
     catch {
