@@ -23,6 +23,18 @@ oo::define App method prepare_ui {} {
 
 oo::define App method make_menubar {} {
     menu .menu
+    my make_file_menu
+    my make_track_menu
+    menu .menu.history
+    .menu add cascade -menu .menu.history -label History -underline 0
+    my populate_history_menu
+    menu .menu.bookmarks
+    .menu add cascade -menu .menu.bookmarks -label Bookmarks -underline 0
+    my populate_bookmarks_menu
+    . configure -menu .menu
+}
+
+oo::define App method make_file_menu {} {
     menu .menu.file
     .menu add cascade -menu .menu.file -label File -underline 0
     .menu.file add command -command [callback on_file_open] -label Open… \
@@ -39,13 +51,34 @@ oo::define App method make_menubar {} {
     .menu.file add command -command [callback on_quit] -label Quit \
         -underline 0 -accelerator Ctrl+Q  -compound left \
         -image [ui::icon quit.svg $::MENU_ICON_SIZE]
-    menu .menu.history
-    .menu add cascade -menu .menu.history -label History -underline 0
-    my populate_history_menu
-    menu .menu.bookmarks
-    .menu add cascade -menu .menu.bookmarks -label Bookmarks -underline 0
-    my populate_bookmarks_menu
-    . configure -menu .menu
+}
+
+oo::define App method make_track_menu {} {
+    menu .menu.track
+    .menu add cascade -menu .menu.track -label Track -underline 0
+    .menu.track add command -command [callback on_play_prev] \
+        -label "Play Previous" -underline 8 -compound left -accelerator F2 \
+        -image [ui::icon media-skip-backward.svg $::MENU_ICON_SIZE]
+    .menu.track add command -command [callback on_play_replay] \
+        -label Replay -underline 0 -compound left -accelerator F3 \
+        -image [ui::icon edit-redo.svg $::MENU_ICON_SIZE]
+    .menu.track add command -command [callback on_play_pause_resume] \
+        -label Pause/Resume -underline 4 -compound left -accelerator F4 \
+        -image [ui::icon media-playback-pause.svg $::MENU_ICON_SIZE]
+    .menu.track add command -command [callback on_play] \
+        -label Play -underline 0 -compound left -accelerator F5 \
+        -image [ui::icon media-playback-start.svg $::MENU_ICON_SIZE]
+    .menu.track add command -command [callback on_play_next] \
+        -label "Play Next" -underline 5 -compound left -accelerator F6 \
+        -image [ui::icon media-skip-forward.svg $::MENU_ICON_SIZE]
+    .menu.track add separator
+    .menu.track add command -command [callback on_volume_down] \
+        -label "Reduce Volume" -underline 7 -compound left -accelerator F7 \
+        -image [ui::icon audio-volume-low.svg $::MENU_ICON_SIZE]
+    .menu.track add command -command [callback on_volume_up] \
+        -label "Increase Volume" -underline 0 -compound left \
+        -accelerator F8 \
+        -image [ui::icon audio-volume-high.svg $::MENU_ICON_SIZE]
 }
 
 oo::define App method make_widgets {} {
@@ -109,6 +142,7 @@ oo::define App method make_layout {} {
 
 oo::define App method make_bindings {} {
     bind . <<MplayerPos>> [callback on_pos %d]
+    bind . <<MplayerStopped>> [callback on_done]
     bind . <<MplayerDebug>> [callback on_debug %d]
     bind $TrackView <Return> [callback on_play]
     bind $TrackView <Double-1> [callback on_play]
@@ -177,6 +211,13 @@ oo::define App method on_pos data {
     lassign $data pos total
     .mf.play.progress configure -value $pos -maximum $total \
         -text "[humanize_secs $pos]/[humanize_secs $total]"
+}
+
+oo::define App method on_done {} {
+    if {[[Config new] auto_play_next]} {
+        after 100
+        my on_play_next
+    }
 }
 
 oo::define App method on_debug data { puts "DBG: '$data'" }

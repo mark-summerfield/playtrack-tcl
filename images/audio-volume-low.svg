@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="45.652582"
-     inkscape:cx="11.729895"
-     inkscape:cy="8.006119"
+     inkscape:cx="8.5427808"
+     inkscape:cy="8.0280235"
      inkscape:current-layer="svg2" />
   <metadata
      id="metadata16">
@@ -59,7 +59,7 @@
      d="m 0,6 v 4 H 1.652 L 5,13.37 V 2.63 L 1.652,6 Z"
      id="path738" />
   <path
-     style="color:#bebebe;marker:none;fill:#b3b3b3;fill-opacity:1"
+     style="color:#bebebe;marker:none;fill:#808080;fill-opacity:1"
      d="M 8.993,8 C 8.993,6.674 8.553,5.458 7.838,4.505 L 6.74,5.487 a 4.9,4.9 0 0 1 0,5.026 l 1.098,0.982 A 5.813,5.813 0 0 0 8.993,8 Z"
      id="path10" />
 </svg>

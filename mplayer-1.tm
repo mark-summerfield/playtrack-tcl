@@ -2,12 +2,16 @@
 
 oo::singleton create Mplayer {
     variable Pipe
+    variable Playing
+    variable Skipper
     variable Debug
     variable Exe
 }
 
 oo::define Mplayer constructor {} {
     set Pipe ""
+    set Playing 0
+    set Skipper 0
     set Debug 0
     if {[set Exe [auto_execok mplayer]] ne ""} { my open }
 }
@@ -39,13 +43,14 @@ oo::define Mplayer method play filename {
     my stop
     after 100        
     my Do "loadfile \"$filename\""
+    set Playing 1
 }
 
 oo::define Mplayer method replay {} { my Do "set_property time_pos 0" }
 
 oo::define Mplayer method pause {} { my Do pause }
 
-oo::define Mplayer method stop {} { my Do stop }
+oo::define Mplayer method stop {} { set Playing 0 ; my Do stop }
 
 oo::define Mplayer method volume_down {} { my Do "volume -5" }
 
@@ -58,7 +63,21 @@ oo::define Mplayer method ReadPipe {} {
         if {[set line [string trim $line]] ne ""} {
             if {[regexp {^A:\s*(\d+.\d+).*?of\s*(\d+.\d+)} $line _ pos \
                     total]} {
-                event generate . <<MplayerPos>> -data "$pos $total"
+                if {$Skipper == 5} {
+                    set Skipper [expr {($Skipper + 1) % 5}]
+                    if {$Playing} {
+                        if {$pos + 1 >= $total} {
+                            set Playing 0
+                            my Do stop
+                            event generate . <<MplayerStopped>>
+                        } else {
+                            event generate . <<MplayerPos>> \
+                                -data "$pos $total"
+                        }
+                    }
+                } else {
+                    incr Skipper
+                }
             } elseif {$Debug} {
                 event generate . <<MplayerDebug>> -data "$line"
             }
@@ -70,6 +89,8 @@ oo::define Mplayer method ReadPipe {} {
         set Pipe ""
     }
 }
+
+oo::define Mplayer method playing {} { return $Playing }
 
 oo::define Mplayer method debug {} { return $Debug }
 oo::define Mplayer method set_debug debug { set Debug $debug }
