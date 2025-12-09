@@ -29,6 +29,13 @@ proc list_to_str lst {
     return "{[join $str " "]}"
 }
 
+proc ldelete {lst item} {
+    if {[set i [lsearch -exact $lst $item]] != -1} {
+        return [lremove $lst $i]
+    }
+    return $lst
+}
+
 proc lrandom lst { lindex $lst [expr {int(rand() * [llength $lst])}] }
 
 proc lstride {lst stride} {

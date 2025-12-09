@@ -52,23 +52,32 @@ oo::define App method on_volume_up {} {
 }
 
 oo::define App method on_history_remove {} {
-    puts on_history_remove ;# TODO
+    if {[set selection [$TrackView selection]] ne ""} {
+        [Config new] remove_history $selection
+        my populate_history_menu
+    }
 }
 
 oo::define App method on_history_edit {} {
-    puts on_history_edit ;# TODO
+    puts on_history_edit ;# TODO like store ignore list dialog
 }
 
 oo::define App method on_bookmarks_add {} {
-    puts on_bookmarks_add ;# TODO
+    if {[set selection [$TrackView selection]] ne ""} {
+        [Config new] add_bookmark $selection
+        my populate_bookmarks_menu
+    }
 }
 
 oo::define App method on_bookmarks_remove {} {
-    puts on_bookmarks_remove ;# TODO
+    if {[set selection [$TrackView selection]] ne ""} {
+        [Config new] remove_bookmark $selection
+        my populate_bookmarks_menu
+    }
 }
 
 oo::define App method on_bookmarks_edit {} {
-    puts on_bookmarks_edit ;# TODO
+    puts on_bookmarks_edit ;# TODO like store ignore list dialog
 }
 
 oo::define App method on_config {} {

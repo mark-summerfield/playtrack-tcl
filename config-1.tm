@@ -102,10 +102,30 @@ oo::define Config method set_auto_play_next auto_play_next {
 
 oo::define Config method history {} { return $History }
 oo::define Config method set_history history { set History $history }
+oo::define Config method add_history history {
+    set dir [file dirname $history]
+    set lst [list]
+    foreach filename $History {
+        if {[file dirname $filename] ne $dir} { lappend lst $filename }
+    }
+    set History [linsert $lst 0 $history]
+    set History [lrange $History 0 25]
+}
+oo::define Config method remove_history history {
+    set History [ldelete $History $history]
+}
 
 oo::define Config method bookmarks {} { return $Bookmarks }
 oo::define Config method set_bookmarks bookmarks {
     set Bookmarks $bookmarks
+}
+oo::define Config method add_bookmark bookmark {
+    set Bookmarks [ldelete $Bookmarks $bookmark]
+    set Bookmarks [linsert $Bookmarks 0 $bookmark]
+    set Bookmarks [lrange $Bookmarks 0 25]
+}
+oo::define Config method remove_bookmark bookmark {
+    set Bookmarks [ldelete $Bookmarks $bookmark]
 }
 
 oo::define Config method to_string {} {

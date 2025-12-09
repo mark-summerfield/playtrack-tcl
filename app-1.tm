@@ -55,8 +55,15 @@ oo::define App method maybe_new_dir filename {
 }
 
 oo::define App method play_track filename {
-    [Config new] set_last_track $filename
+    set config [Config new]
+    $config set_last_track $filename
     wm title . "[humanize_filename $filename] — [tk appname]"
     my maybe_new_dir $filename
     $Player play $filename
+    catch {
+        $TrackView selection set $filename
+        $TrackView see $filename
+    }
+    $config add_history $filename
+    my populate_history_menu    
 }
