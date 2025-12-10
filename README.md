@@ -14,8 +14,8 @@ control so github is only used to make the code public.
 
 ## Dependencies
 
-Tcl/Tk >= 9.0.2; Tcllib >= 2.0; Tklib >= 0.9;
-mplayer executable (which must be in the $PATH).
+Tcl/Tk >= 9.0.2; Tcllib >= 2.0; Tklib >= 0.9; mplayer executable (which must
+be in the `$PATH`).
 
 ## License
 
