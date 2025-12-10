@@ -44,18 +44,26 @@ oo::define App method maybe_new_dir filename {
             [.mf.dirLabel cget -text]} {
         .mf.dirLabel configure -text $dir_label
         $TrackView delete [$TrackView children {}]
-        set filenames [glob -directory $dir *.{mp3,ogg}]
-        set n 0
-        foreach name [lsort -dictionary $filenames] {
-            $TrackView insert {} end -id [to_id $name] \
-                -text "[format %2d [incr n]].  [humanize_trackname $name]"
-        }
+        my ShowTracks [glob -directory $dir *.{mp3,ogg}]
     }
     catch {
         set name [to_id $filename]
         $TrackView selection set $name
         $TrackView see $name
     }
+}
+
+oo::define App method ShowTracks filenames {
+    set width 0
+    set n 0
+    foreach name [lsort -dictionary $filenames] {
+        set track [humanize_trackname $name]
+        if {[set w [string length $track]] > $width} { set width $w }
+        $TrackView insert {} end -id [to_id $name] -text "[incr n]. " \
+            -values [list $track]
+    }
+    set span [string repeat W $width]
+    $TrackView column 0 -width [font measure TkDefaultFont $span]
 }
 
 oo::define App method play_track filename {

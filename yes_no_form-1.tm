@@ -36,7 +36,7 @@ oo::define YesNoForm method make_widgets {title body_text} {
         set size [expr {max(24, round(16 * [tk scaling]))}]
     }
     tk::toplevel .yesno_form
-    wm resizable .yesno_form false false
+    wm resizable .yesno_form 0 0
     wm title .yesno_form $title
     ttk::frame .yesno_form.frame
     ttk::label .yesno_form.frame.label -text $body_text -anchor center \
@@ -59,7 +59,7 @@ oo::define YesNoForm method make_layout {} {
     grid rowconfigure .yesno_form 0 -weight 1
     grid columnconfigure .yesno_form 0 -weight 1
     grid columnconfigure .yesno_form 1 -weight 1
-    pack .yesno_form.frame -fill both -expand true
+    pack .yesno_form.frame -fill both -expand 1
 }
 
 oo::define YesNoForm method make_bindings default {

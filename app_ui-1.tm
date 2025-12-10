@@ -86,8 +86,11 @@ oo::define App method make_widgets {} {
     ttk::label .mf.dirLabel -relief sunken
     set sa [scrollutil::scrollarea .mf.sa]
     set TrackView [ttk::treeview .mf.sa.tv -selectmode browse -show tree \
-                   -style List.Treeview -striped 1]
+                   -style List.Treeview -striped 1 -columns {n track}]
     $sa setwidget $TrackView
+    set nwidth [font measure TkDefaultFont 9999]
+    $TrackView column #0 -width $nwidth -stretch 0 -anchor e
+    $TrackView column 0 -stretch 1 -anchor w
     my make_playbar
 }
 
@@ -136,8 +139,8 @@ oo::define App method make_layout {} {
     pack .mf.play.progress -fill both -expand 1 -side left {*}$opts
     pack .mf.play.volumeDownButton -side left {*}$opts
     pack .mf.play.volumeUpButton -side left {*}$opts
-    pack .mf.sa -fill both -expand true
-    pack .mf -fill both -expand true
+    pack .mf.sa -fill both -expand 1
+    pack .mf -fill both -expand 1
 }
 
 oo::define App method make_bindings {} {

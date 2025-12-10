@@ -31,7 +31,7 @@ oo::define ConfigForm constructor {ok debug} {
 oo::define ConfigForm method make_widgets {} {
     set config [Config new]
     tk::toplevel .configForm
-    wm resizable .configForm false false
+    wm resizable .configForm 0 0
     wm title .configForm "[tk appname] — Options"
     ttk::frame .configForm.mf
     set tip tooltip::tooltip
@@ -89,13 +89,12 @@ oo::define ConfigForm method make_layout {} {
         -columnspan 2 -sticky we {*}$opts
     grid .configForm.mf.buttons -row 9 -column 0 -columnspan 3 \
         -sticky we
-    pack [ttk::frame .configForm.mf.buttons.pad1] -side left -expand true
+    pack [ttk::frame .configForm.mf.buttons.pad1] -side left -expand 1
     pack .configForm.mf.buttons.okButton -side left {*}$opts
     pack .configForm.mf.buttons.cancelButton -side left {*}$opts
-    pack [ttk::frame .configForm.mf.buttons.pad2] -side right \
-        -expand true
+    pack [ttk::frame .configForm.mf.buttons.pad2] -side right -expand 1
     grid columnconfigure .configForm.mf 1 -weight 1
-    pack .configForm.mf -fill both -expand true
+    pack .configForm.mf -fill both -expand 1
 }
 
 oo::define ConfigForm method make_bindings {} {
