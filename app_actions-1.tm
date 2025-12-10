@@ -6,10 +6,10 @@ package require misc
 package require ref
 
 oo::define App method on_file_open {} {
-    const filetypes {{{Audio Files} {.mp3 .ogg}}}
+    const FILETYPES {{{Audio Files} {.mp3 .ogg}}}
     set filename [[Config new] last_track]
     set dir [get_music_dir $filename]
-    set filename [tk_getOpenFile -parent . -filetypes $filetypes \
+    set filename [tk_getOpenFile -parent . -filetypes $FILETYPES \
                   -initialdir $dir]
     if {$filename ne ""} {
         my play_track $filename
