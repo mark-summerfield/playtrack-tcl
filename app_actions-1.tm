@@ -17,9 +17,9 @@ oo::define App method on_file_open {} {
 }
 
 oo::define App method on_play_prev {} {
-    if {[set prev [$TrackView prev [$TrackView selection]]] ne ""} {
-        $TrackView selection set $prev
-        $TrackView see $prev
+    if {[set prev [$TrackTree prev [$TrackTree selection]]] ne ""} {
+        $TrackTree selection set $prev
+        $TrackTree see $prev
         my play_track $prev
     }
 }
@@ -29,15 +29,15 @@ oo::define App method on_play_replay {} { $Player replay }
 oo::define App method on_play_pause_resume {} { $Player pause }
 
 oo::define App method on_play {} {
-    if {[set selection [$TrackView selection]] ne ""} {
+    if {[set selection [$TrackTree selection]] ne ""} {
         my play_track $selection
     }
 }
 
 oo::define App method on_play_next {} {
-    if {[set next [$TrackView next [$TrackView selection]]] ne ""} {
-        $TrackView selection set $next
-        $TrackView see $next
+    if {[set next [$TrackTree next [$TrackTree selection]]] ne ""} {
+        $TrackTree selection set $next
+        $TrackTree see $next
         my play_track $next
     }
 }
@@ -51,21 +51,21 @@ oo::define App method on_volume_up {} {
 }
 
 oo::define App method on_history_remove {} {
-    if {[set selection [$TrackView selection]] ne ""} {
+    if {[set selection [$TrackTree selection]] ne ""} {
         [Config new] remove_history [from_id $selection]
         my populate_history_menu
     }
 }
 
 oo::define App method on_bookmarks_add {} {
-    if {[set selection [$TrackView selection]] ne ""} {
+    if {[set selection [$TrackTree selection]] ne ""} {
         [Config new] add_bookmark [from_id $selection]
         my populate_bookmarks_menu
     }
 }
 
 oo::define App method on_bookmarks_remove {} {
-    if {[set selection [$TrackView selection]] ne ""} {
+    if {[set selection [$TrackTree selection]] ne ""} {
         [Config new] remove_bookmark [from_id $selection]
         my populate_bookmarks_menu
     }

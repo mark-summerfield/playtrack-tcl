@@ -6,7 +6,8 @@ package require ui
 
 oo::singleton create App {
     variable Player
-    variable TrackView
+    variable TrackTree
+    variable GotSecs
 }
 
 package require app_actions
@@ -17,6 +18,7 @@ oo::define App constructor {} {
     tk appname PlayTrack
     Config new ;# we need tk scaling done early
     set Player ""
+    set GotSecs 0
     my make_ui
 }
 
@@ -34,7 +36,7 @@ oo::define App method on_startup {} {
     if {[set filename [$config last_track]] ne ""} {
         my maybe_new_dir $filename
     }
-    focus $TrackView
+    focus $TrackTree
 }
 
 oo::define App method maybe_new_dir filename {
@@ -43,28 +45,24 @@ oo::define App method maybe_new_dir filename {
     if {[set dir_label [regsub -- $home $dir ""]] ne \
             [.mf.dirLabel cget -text]} {
         .mf.dirLabel configure -text $dir_label
-        $TrackView delete [$TrackView children {}]
-        my PopulateTrackView [glob -directory $dir *.{mp3,ogg}]
+        $TrackTree delete [$TrackTree children {}]
+        my PopulateTrackTree [glob -directory $dir *.{mp3,ogg}]
     }
     catch {
         set name [to_id $filename]
-        $TrackView selection set $name
-        $TrackView see $name
+        $TrackTree selection set $name
+        $TrackTree see $name
     }
 }
 
-oo::define App method PopulateTrackView filenames {
+oo::define App method PopulateTrackTree filenames {
     set width 0
     set n 0
     foreach name [lsort -dictionary $filenames] {
         set track [humanize_trackname $name]
         if {[set w [string length $track]] > $width} { set width $w }
-        $TrackView insert {} end -id [to_id $name] -text "[incr n]. " \
+        $TrackTree insert {} end -id [to_id $name] -text "[incr n]. " \
             -values [list $track]
-    }
-    if {[set width [font measure TkDefaultFont [string repeat W $width]]] \
-            > [$TrackView column 0 -minwidth]} {
-        $TrackView column 0 -minwidth $width
     }
 }
 
@@ -72,8 +70,9 @@ oo::define App method play_track filename {
     set filename [from_id $filename]
     set config [Config new]
     $config set_last_track $filename
-    wm title . "[humanize_filename $filename] — [tk appname]"
+    wm title . "[humanize_trackname $filename] — [tk appname]"
     my maybe_new_dir $filename
+    set GotSecs 0
     $Player play $filename
     $config add_history $filename
     my populate_history_menu    
