@@ -4,12 +4,12 @@ package require about_form
 package require config_form
 package require misc
 package require ref
+package require mplayer
 
 oo::define App method on_file_open {} {
-    const FILETYPES {{{Audio Files} {.mp3 .ogg}}}
     set filename [[Config new] last_track]
     set dir [get_music_dir $filename]
-    set filename [tk_getOpenFile -parent . -filetypes $FILETYPES \
+    set filename [tk_getOpenFile -parent . -filetypes [Mplayer filetypes] \
                   -initialdir $dir]
     if {$filename ne ""} {
         my play_track $filename
