@@ -2,6 +2,7 @@
 
 package require config
 package require misc
+package require ogg
 package require ui
 
 oo::singleton create App {
@@ -56,13 +57,12 @@ oo::define App method maybe_new_dir filename {
 }
 
 oo::define App method PopulateTrackTree filenames {
-    set width 0
     set n 0
     foreach name [lsort -dictionary $filenames] {
-        set track [humanize_trackname $name]
-        if {[set w [string length $track]] > $width} { set width $w }
+        set secs [ogg::duration_in_secs $name]
+        set secs [expr {$secs ? [humanize_secs $secs 1] : ""}]
         $TrackTree insert {} end -id [to_id $name] -text "[incr n]. " \
-            -values [list $track]
+            -values [list [humanize_trackname $name] $secs]
     }
 }
 
